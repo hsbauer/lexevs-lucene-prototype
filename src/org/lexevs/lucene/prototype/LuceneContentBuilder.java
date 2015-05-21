@@ -13,10 +13,7 @@ public class LuceneContentBuilder {
 	  private SecureRandom random = new SecureRandom();
 	  
 	public LuceneContentBuilder() {
-		// TODO Auto-g	enerated constructor stub
 	}
-
-
 	
 	public String randomTextGenerator(){
 		return new BigInteger(130, random).toString(32);
@@ -27,10 +24,10 @@ public class LuceneContentBuilder {
 	}
 	
 	public String randomTextGenerator(int length, String salt){
-		String randomText = new BigInteger(130, random).toString(randomNumberGenerator()) + salt + 
-				new BigInteger(130, random).toString(randomNumberGenerator()) + 
-				new BigInteger(130, random).toString(randomNumberGenerator()) + 
-				new BigInteger(130, random).toString(randomNumberGenerator()) + salt;
+		String randomText = randomTextGenerator(randomNumberGenerator()) + " "+
+				randomTextGenerator(randomNumberGenerator()) + " "+ salt + " "+
+				randomTextGenerator(randomNumberGenerator()) + " "+
+				randomTextGenerator(randomNumberGenerator());
 		return randomText;
 	}
 	
@@ -80,6 +77,28 @@ public class LuceneContentBuilder {
 		return o;
 	}
 	
+	public DocObject generateChildDocWithSalt(DocObject parent, String salt){
+		DocObject o = new DocObject();
+		o.UID = randomTextGenerator();
+		o.entityCode = parent.entityCode;
+		o.entityCodeNamepace = parent.entityCodeNamepace;
+		o.dm_propertyValue = randomTextGenerator();
+		o.isPreferred = randomTextGenerator();
+		o.language = "en";
+		o.literal_propertyValue = randomTextGenerator();
+		o.literal_reverse_propertyValue = randomTextGenerator();
+		o.propertyId = randomTextGenerator();
+		o.propertyName = randomTextGenerator();
+		o.propertyType = randomTextGenerator();
+		o.propertyValue = salt;
+		o.qualifiers = randomTextGenerator();
+		o.representationalForm = randomTextGenerator();
+		o.reverse_propertyValue = randomTextGenerator();
+		o.sources = randomTextGenerator();
+		o.stem_PropertyValue = randomTextGenerator();
+		o.untokenizedLCPropertyValue = randomTextGenerator();
+		return o;
+	}
 	
 	public Document mapToDocument(DocObject doc){
 		Class<? extends DocObject> clazz = doc.getClass();
@@ -104,7 +123,7 @@ public class LuceneContentBuilder {
 	}
 	
 	
-	public static void main(String[] args) {
+public static void main(String[] args) {
 		
 	LuceneContentBuilder builder = new LuceneContentBuilder();
 	for(int i = 10; i > 0; i--){

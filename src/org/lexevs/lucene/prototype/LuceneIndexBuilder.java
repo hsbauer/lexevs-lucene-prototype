@@ -42,17 +42,48 @@ public class LuceneIndexBuilder {
 			e.printStackTrace();
 		}
 	}
-	public void createCodingSchemeIndex(CodingScheme scheme, LuceneContentBuilder builder, IndexWriter writer){
+	public void createCodingSchemeIndex(CodingScheme scheme, LuceneContentBuilder builder, IndexWriter writer) throws IOException{
 		for(CodingScheme cs: CodingScheme.values()){
+			int count = 0;
 			for(int i = 0; i < cs.numberOfEntities; i++){
-				DocObject parent = builder.generateParentDoc(cs.getCodingSchemeName(), cs.getVersion(),cs.getURI());
-				DocObject child = builder.generateChildDoc(parent);
+				List<Document> list = createBlockJoin(cs, builder, count++);
+				writer.addDocuments(list);
 			}
 		}
-		
 	}
-	public List<Document> createBlockJoin(){
-		return null;
+	
+	public List<Document> createBlockJoin(CodingScheme cs, LuceneContentBuilder builder, int count){
+		List<Document> list = new ArrayList<Document>();
+
+		DocObject parent = builder.generateParentDoc(cs.getCodingSchemeName(),
+				cs.getVersion(), cs.getURI());
+		if (cs.codingSchemeName.equals(CodingScheme.THESSCHEME.codingSchemeName)) {
+			int numberOfProperties = 12;
+			while (numberOfProperties < 0) {
+				if(count % 544 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, "blood");
+					Document doc = builder.mapToDocument(child);
+					count++;
+				}else if(count % 6 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, "a");
+					Document doc = builder.mapToDocument(child);
+				}else if(count % 57 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, "the");
+					Document doc = builder.mapToDocument(child);
+				}else if(count % 2232 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, "Lung Cancer");
+					Document doc = builder.mapToDocument(child);
+				}else if(count % 2232 == 0){
+					
+				}
+				DocObject child = builder.generateChildDoc(parent);
+				Document doc = builder.mapToDocument(child);
+				list.add(doc);
+			}
+			Document par = builder.mapToDocument(parent);
+			list.add(par);
+		}
+		return list;
 	}
 
 	public static void main(String[] args) {
