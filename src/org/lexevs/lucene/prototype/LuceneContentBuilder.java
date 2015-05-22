@@ -31,6 +31,14 @@ public class LuceneContentBuilder {
 		return randomText;
 	}
 	
+	public String randomTextGeneratorStartsWith(int length, String salt){
+		String randomText =  salt + " "+ randomTextGenerator(randomNumberGenerator()) + " "+
+				randomTextGenerator(randomNumberGenerator()) + " "+ 
+				randomTextGenerator(randomNumberGenerator()) + " "+
+				randomTextGenerator(randomNumberGenerator());
+		return randomText;
+	}
+	
 	public int randomNumberGenerator(){
 		 Random randomGenerator = new Random();
 		 return randomGenerator.nextInt(32);
@@ -99,6 +107,8 @@ public class LuceneContentBuilder {
 		o.untokenizedLCPropertyValue = randomTextGenerator();
 		return o;
 	}
+	
+	
 	
 	public Document mapToDocument(DocObject doc){
 		Class<? extends DocObject> clazz = doc.getClass();

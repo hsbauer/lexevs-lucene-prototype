@@ -45,40 +45,211 @@ public class LuceneIndexBuilder {
 	public void createCodingSchemeIndex(CodingScheme scheme, LuceneContentBuilder builder, IndexWriter writer) throws IOException{
 		for(CodingScheme cs: CodingScheme.values()){
 			int count = 0;
+			boolean done = false;
 			for(int i = 0; i < cs.numberOfEntities; i++){
-				List<Document> list = createBlockJoin(cs, builder, count++);
+				List<Document> list = createBlockJoin(cs, builder, count++, done);
 				writer.addDocuments(list);
 			}
 		}
 	}
 	
-	public List<Document> createBlockJoin(CodingScheme cs, LuceneContentBuilder builder, int count){
+	public List<Document> createBlockJoin(CodingScheme cs, LuceneContentBuilder builder, int count, boolean done){
 		List<Document> list = new ArrayList<Document>();
 
 		DocObject parent = builder.generateParentDoc(cs.getCodingSchemeName(),
 				cs.getVersion(), cs.getURI());
 		if (cs.codingSchemeName.equals(CodingScheme.THESSCHEME.codingSchemeName)) {
+			//One per coding Scheme
 			int numberOfProperties = 12;
-			while (numberOfProperties < 0) {
-				if(count % 544 == 0){
-					DocObject child = builder.generateChildDocWithSalt(parent, "blood");
-					Document doc = builder.mapToDocument(child);
-					count++;
-				}else if(count % 6 == 0){
-					DocObject child = builder.generateChildDocWithSalt(parent, "a");
-					Document doc = builder.mapToDocument(child);
-				}else if(count % 57 == 0){
-					DocObject child = builder.generateChildDocWithSalt(parent, "the");
-					Document doc = builder.mapToDocument(child);
-				}else if(count % 2232 == 0){
-					DocObject child = builder.generateChildDocWithSalt(parent, "Lung Cancer");
-					Document doc = builder.mapToDocument(child);
-				}else if(count % 2232 == 0){
-					
+				if(!done){
+				DocObject child1 = builder.generateChildDocWithSalt(parent,SearchTerms.BLOOD.getTerm());
+				Document doc1 = builder.mapToDocument(child1);
+				list.add(doc1);
+				count++;
+
+				DocObject child = builder.generateChildDocWithSalt(parent,SearchTerms.CHAR.term);
+				Document doc = builder.mapToDocument(child);
+				count++;
+				list.add(doc);
+				done = true;
 				}
+			while (numberOfProperties < 0) {
+				//Semi random application of some search terms.  Attempting to replicate
+				//Number of values present in previous searches.
+				if(count % 708 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, 
+							builder.randomTextGenerator(
+									builder.randomNumberGenerator(),SearchTerms.BLOOD.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 8 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, 
+							builder.randomTextGenerator(
+							builder.randomNumberGenerator(),SearchTerms.CHAR.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 57 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, 
+							builder.randomTextGenerator(
+							builder.randomNumberGenerator(),SearchTerms.ARTICLE.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 5953 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGenerator(
+									builder.randomNumberGenerator(),SearchTerms.LUNG_CANCER.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 13395 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGenerator(
+									builder.randomNumberGenerator(),SearchTerms.LIVER_CARCINOMA.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 2363 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGeneratorStartsWith(
+									builder.randomNumberGenerator(),SearchTerms.BLOOD.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 76 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGeneratorStartsWith(
+									builder.randomNumberGenerator(),SearchTerms.ARTICLE.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 3572 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGeneratorStartsWith(
+									builder.randomNumberGenerator(),SearchTerms.LUNG_CANCER.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 20 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGeneratorStartsWith(
+									builder.randomNumberGenerator(),SearchTerms.CHAR.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else{
 				DocObject child = builder.generateChildDoc(parent);
 				Document doc = builder.mapToDocument(child);
 				list.add(doc);
+				count++;
+				}
+			}
+			Document par = builder.mapToDocument(parent);
+			list.add(par);
+		}
+		if (cs.codingSchemeName.equals(CodingScheme.SNOMEDSCHEME.codingSchemeName)) {
+			//One per coding Scheme
+			int numberOfProperties = 12;
+				if(!done){
+				DocObject child1 = builder.generateChildDocWithSalt(parent,SearchTerms.BLOOD.getTerm());
+				Document doc1 = builder.mapToDocument(child1);
+				list.add(doc1);
+				count++;
+
+				DocObject child = builder.generateChildDocWithSalt(parent,SearchTerms.CHAR.term);
+				Document doc = builder.mapToDocument(child);
+				count++;
+				list.add(doc);
+				done = true;
+				}
+			while (numberOfProperties < 0) {
+				//Semi random application of some search terms.  Attempting to replicate
+				//Number of values present in previous searches.
+				if(count % 212 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, 
+							builder.randomTextGenerator(
+									builder.randomNumberGenerator(),SearchTerms.BLOOD.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 50081 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, 
+							builder.randomTextGenerator(
+							builder.randomNumberGenerator(),SearchTerms.MUD.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 5 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, 
+							builder.randomTextGenerator(
+							builder.randomNumberGenerator(),SearchTerms.CHAR.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 85 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, 
+							builder.randomTextGenerator(
+							builder.randomNumberGenerator(),SearchTerms.ARTICLE.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 50082 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGenerator(
+									builder.randomNumberGenerator(),SearchTerms.LUNG_CANCER.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 60098 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGenerator(
+									builder.randomNumberGenerator(),SearchTerms.LIVER_CARCINOMA.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 91 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGeneratorStartsWith(
+									builder.randomNumberGenerator(),SearchTerms.BLOOD.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 60097 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, 
+							builder.randomTextGeneratorStartsWith(
+							builder.randomNumberGenerator(),SearchTerms.MUD.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 465 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGeneratorStartsWith(
+									builder.randomNumberGenerator(),SearchTerms.ARTICLE.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 3572 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGeneratorStartsWith(
+									builder.randomNumberGenerator(),SearchTerms.LUNG_CANCER.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 11 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGeneratorStartsWith(
+									builder.randomNumberGenerator(),SearchTerms.CHAR.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else{
+				DocObject child = builder.generateChildDoc(parent);
+				Document doc = builder.mapToDocument(child);
+				list.add(doc);
+				count++;
+				}
 			}
 			Document par = builder.mapToDocument(parent);
 			list.add(par);

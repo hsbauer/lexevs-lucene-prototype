@@ -6,8 +6,8 @@ public enum SearchTerms {
 	MUD("mud"),
 	ARTICLE("The"),
 	CHAR("a"),
-	PHRASE1("Lung Cancer"), 
-	PHRASE2("liver carcinoma");
+	LUNG_CANCER("Lung Cancer"), 
+	LIVER_CARCINOMA("liver carcinoma");
 
 	String term;
 	SearchTerms(String term){

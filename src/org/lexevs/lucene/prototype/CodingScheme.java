@@ -4,7 +4,7 @@ public enum CodingScheme {
 	
 SCHEME1("AScheme", "1.0", "this.is.a.scheme", 3000 ), 
 THESSCHEME("ThesScheme", "2014_12_1", "some.scheme.this.is", 160747),
-SCHEME3("NiceCodingScheme", "v34.1", "nice.coding.scheme", 300488),
+SNOMEDSCHEME("SNOMEDScheme", "v34.1", "nice.coding.scheme", 300488),
 METASCHEME("NCIMetaCodingScheme", "2014", "big.coding.scheme", 2418224),
 SCHEME5("BiggestCodingScheme", "2015_12_56", "biggest.one.yet", 3600000), 
 SCHEME6("YetAnotherScheme", "20.3", "yet.another.coding.sheme", 8000),
