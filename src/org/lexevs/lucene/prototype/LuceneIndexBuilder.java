@@ -230,14 +230,120 @@ public class LuceneIndexBuilder {
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;
-				}else if(count % 3572 == 0){
+				}else if(count % 11 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGeneratorStartsWith(
+									builder.randomNumberGenerator(),SearchTerms.CHAR.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else{
+				DocObject child = builder.generateChildDoc(parent);
+				Document doc = builder.mapToDocument(child);
+				list.add(doc);
+				count++;
+				}
+			}
+			Document par = builder.mapToDocument(parent);
+			list.add(par);
+		}
+		if (cs.codingSchemeName.equals(CodingScheme.METASCHEME.codingSchemeName)) {
+			
+			//One per coding Scheme
+			int numberOfProperties = 12;
+				if(!done){
+				DocObject child1 = builder.generateChildDocWithSalt(parent,SearchTerms.BLOOD.getTerm());
+				Document doc1 = builder.mapToDocument(child1);
+				list.add(doc1);
+				count++;
+
+				DocObject child = builder.generateChildDocWithSalt(parent,SearchTerms.CHAR.term);
+				Document doc = builder.mapToDocument(child);
+				count++;
+				list.add(doc);
+				done = true;
+				}
+			while (numberOfProperties < 0) {
+				//Semi random application of some search terms.  Attempting to replicate
+				//Number of values present in previous searches.
+				if(count % 529 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, 
+							builder.randomTextGenerator(
+									builder.randomNumberGenerator(),SearchTerms.BLOOD.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 71124 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, 
+							builder.randomTextGenerator(
+							builder.randomNumberGenerator(),SearchTerms.MUD.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 4 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, 
+							builder.randomTextGenerator(
+							builder.randomNumberGenerator(),SearchTerms.CHAR.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 112 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, 
+							builder.randomTextGenerator(
+							builder.randomNumberGenerator(),SearchTerms.ARTICLE.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 29490 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGenerator(
+									builder.randomNumberGenerator(),SearchTerms.LUNG_CANCER.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 142248 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGenerator(
+									builder.randomNumberGenerator(),SearchTerms.LIVER_CARCINOMA.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 725 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGeneratorStartsWith(
+									builder.randomNumberGenerator(),SearchTerms.BLOOD.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 96728 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent, 
+							builder.randomTextGeneratorStartsWith(
+							builder.randomNumberGenerator(),SearchTerms.MUD.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 505 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGeneratorStartsWith(
+									builder.randomNumberGenerator(),SearchTerms.ARTICLE.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 37203 == 0){
 					DocObject child = builder.generateChildDocWithSalt(parent,
 							builder.randomTextGeneratorStartsWith(
 									builder.randomNumberGenerator(),SearchTerms.LUNG_CANCER.getTerm()));
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;
-				}else if(count % 11 == 0){
+				}else if(count % 806074 == 0){
+					DocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGeneratorStartsWith(
+									builder.randomNumberGenerator(),SearchTerms.LIVER_CARCINOMA.getTerm()));
+					Document doc = builder.mapToDocument(child);
+					list.add(doc);
+					count++;
+				}else if(count % 12 == 0){
 					DocObject child = builder.generateChildDocWithSalt(parent,
 							builder.randomTextGeneratorStartsWith(
 									builder.randomNumberGenerator(),SearchTerms.CHAR.getTerm()));
