@@ -7,7 +7,10 @@ public enum SearchTerms {
 	ARTICLE("The"),
 	CHAR("a"),
 	LUNG_CANCER("Lung Cancer"), 
-	LIVER_CARCINOMA("liver carcinoma");
+	LIVER_CARCINOMA("liver carcinoma"),
+	CODE1("C1243"),
+	CODE2("10024003"),
+	CODE3("8.61");
 
 	String term;
 	SearchTerms(String term){
