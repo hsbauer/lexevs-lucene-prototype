@@ -3,14 +3,20 @@ package org.lexevs.lucene.prototype;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.CachingWrapperFilter;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
@@ -32,7 +38,7 @@ public class LuceneQueryTrial {
 		this.index = index;
 	}
 	
-	public void luceneQuery(SearchTerms term, CodingScheme scheme) throws IOException{
+	public void luceneQuery(SearchTerms term, CodingScheme scheme) throws IOException, ParseException{
 		int hitsPerPage = 10000;
 		IndexReader reader = IndexReader.open(index);
 		IndexSearcher searcher = new IndexSearcher(reader);
@@ -48,11 +54,12 @@ public class LuceneQueryTrial {
                   new QueryWrapperFilter(
                     new TermQuery(
                       new Term("codingSchemeName", "thesscheme"))));
-		  BooleanQuery termQuery = new BooleanQuery();
-		  termQuery.add(new TermQuery(new Term("propertyValue", "blood")), Occur.MUST);
+//		  BooleanQuery termQuery = new BooleanQuery();
+//		  termQuery.add(new TermQuery(new Term("propertyValue", "blood")), Occur.MUST);
+		  Query query = new QueryParser("propertyValue", new StandardAnalyzer(new CharArraySet( 0, true))).parse("Blood");
 //		  ToChildBlockJoinQuery termJoinQuery = new ToChildBlockJoinQuery(termQuery, codingScheme, false);
 		  ToParentBlockJoinQuery termJoinQuery = new ToParentBlockJoinQuery(
-				    termQuery, 
+				    query, 
 				    codingScheme,
 				    ScoreMode.None);
 		  searcher.search(termJoinQuery, collector);
@@ -99,6 +106,9 @@ public class LuceneQueryTrial {
 //			trial.luceneQuery(SearchTerms.LUNG_CANCER, CodingScheme.THESSCHEME);
 //			trial.luceneQuery(SearchTerms.LIVER_CARCINOMA, CodingScheme.THESSCHEME);
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
