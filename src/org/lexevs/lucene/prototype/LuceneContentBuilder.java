@@ -44,11 +44,10 @@ public class LuceneContentBuilder {
 		 return randomGenerator.nextInt(32);
 	}
 	
-	public DocObject generateChildDoc(DocObject parent){
-		DocObject o = new DocObject();
-		o.UID = randomTextGenerator();
-		o.entityCode = parent.entityCode;
-		o.entityCodeNamepace = parent.entityCodeNamepace;
+	public ChildDocObject generateChildDoc(ParentDocObject parent){
+		ChildDocObject o = new ChildDocObject();
+//		o.UID = randomTextGenerator();
+		o.namespace = parent.entityCodeNamepace;
 		o.dm_propertyValue = randomTextGenerator();
 		o.isPreferred = randomTextGenerator();
 		o.language = "en";
@@ -67,10 +66,10 @@ public class LuceneContentBuilder {
 		return o;
 	}
 	
-	public DocObject generateParentDoc(String codingScheme, String version, String URI){
-		DocObject o = new DocObject();
+	public ParentDocObject generateParentDoc(String codingScheme, String version, String URI){
+		ParentDocObject o = new ParentDocObject();
 		o.codingSchemeId = URI;
-		o.UID = randomTextGenerator();
+//		o.UID = randomTextGenerator();
 		o.codingSchemeName = codingScheme;
 		o.codingSchemeVersion = version;
 		o.entityCode = randomTextGenerator();
@@ -85,11 +84,11 @@ public class LuceneContentBuilder {
 		return o;
 	}
 	
-	public DocObject generateChildDocWithSalt(DocObject parent, String salt){
-		DocObject o = new DocObject();
-		o.UID = randomTextGenerator();
-		o.entityCode = parent.entityCode;
-		o.entityCodeNamepace = parent.entityCodeNamepace;
+	public ChildDocObject generateChildDocWithSalt(ParentDocObject parent, String salt){
+		ChildDocObject o = new ChildDocObject();
+//		o.UID = randomTextGenerator();
+//		o.entityCode = parent.entityCode;
+		o.namespace = parent.entityCodeNamepace;
 		o.dm_propertyValue = randomTextGenerator();
 		o.isPreferred = randomTextGenerator();
 		o.language = "en";
@@ -116,11 +115,12 @@ public class LuceneContentBuilder {
 		for(java.lang.reflect.Field field : clazz.getFields()){
 		try {
 			String fieldName = field.getName();
-			byte[] fieldValue = null;
+			String fieldValue = null;
 			if(field.get(doc) != null){
-				fieldValue = field.get(doc).toString().getBytes();
+				fieldValue = field.get(doc).toString();
+				document.add(new org.apache.lucene.document.TextField(fieldName, fieldValue, Field.Store.YES));
 			}
-			document.add(new org.apache.lucene.document.Field(fieldName, fieldValue, TextField.TYPE_NOT_STORED));
+		
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -137,9 +137,9 @@ public static void main(String[] args) {
 		
 	LuceneContentBuilder builder = new LuceneContentBuilder();
 	for(int i = 10; i > 0; i--){
-		DocObject parent = builder.generateParentDoc("CodingScheme","version", "uri");
+		ParentDocObject parent = builder.generateParentDoc("CodingScheme","version", "uri");
 		System.out.println("Parent: " + parent.toString());
-		DocObject child = builder.generateChildDoc(parent);
+		ChildDocObject child = builder.generateChildDoc(parent);
 		System.out.println("Child: " + child.toString());
 	}
 
