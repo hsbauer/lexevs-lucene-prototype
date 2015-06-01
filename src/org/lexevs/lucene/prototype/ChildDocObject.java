@@ -5,6 +5,7 @@ public class ChildDocObject extends DocObject {
 
 		public String degreeOfFidelity;
 		public String dm_propertyValue;
+		public String ecode;
 		public String isPreferred;
 		public String language;
 		public String literal_propertyValue;

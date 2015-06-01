@@ -66,28 +66,30 @@ public class LuceneContentBuilder {
 		return o;
 	}
 	
-	public ParentDocObject generateParentDoc(String codingScheme, String version, String URI){
+	public ParentDocObject generateParentDoc(String codingScheme, String version, String URI, String salt){
 		ParentDocObject o = new ParentDocObject();
 		o.codingSchemeId = URI;
-//		o.UID = randomTextGenerator();
+		o.blockId = randomTextGenerator();
 		o.codingSchemeName = codingScheme;
 		o.codingSchemeVersion = version;
 		o.entityCode = randomTextGenerator();
 		o.entityCodeLC = randomTextGenerator();
 		o.entityCodeNamepace = codingScheme;
-		o.entityDescription = randomTextGenerator();
+		o.entityDescription = salt;
 		o.entityType = randomTextGenerator();
 		o.entityUID = randomTextGenerator();
 		o.format = randomTextGenerator();
 		o.isActive = randomTextGenerator();
 		o.isAnonymous = randomTextGenerator();
+		o.parentDoc = "yes";
 		return o;
 	}
 	
 	public ChildDocObject generateChildDocWithSalt(ParentDocObject parent, String salt){
 		ChildDocObject o = new ChildDocObject();
 //		o.UID = randomTextGenerator();
-//		o.entityCode = parent.entityCode;
+		o.blockId = parent.blockId;
+		o.ecode = parent.entityCode;
 		o.namespace = parent.entityCodeNamepace;
 		o.dm_propertyValue = randomTextGenerator();
 		o.isPreferred = randomTextGenerator();
@@ -137,7 +139,7 @@ public static void main(String[] args) {
 		
 	LuceneContentBuilder builder = new LuceneContentBuilder();
 	for(int i = 10; i > 0; i--){
-		ParentDocObject parent = builder.generateParentDoc("CodingScheme","version", "uri");
+		ParentDocObject parent = builder.generateParentDoc("CodingScheme","version", "uri", "blood");
 		System.out.println("Parent: " + parent.toString());
 		ChildDocObject child = builder.generateChildDoc(parent);
 		System.out.println("Child: " + child.toString());
