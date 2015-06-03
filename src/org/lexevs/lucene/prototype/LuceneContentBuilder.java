@@ -134,6 +134,33 @@ public class LuceneContentBuilder {
 		return document;
 	}
 	
+	public Document mapToDocumentExactMatch(DocObject doc){
+		Class<? extends DocObject> clazz = doc.getClass();
+		Document document = new Document();
+		for(java.lang.reflect.Field field : clazz.getFields()){
+		try {
+			String fieldName = field.getName();
+			String fieldValue = null;
+			if(field.get(doc) != null){
+				fieldValue = field.get(doc).toString();
+				if(fieldName.equals("propertyValue")){
+				document.add(new org.apache.lucene.document.StringField(fieldName, fieldValue, Field.Store.YES));
+				}else{
+					document.add(new org.apache.lucene.document.TextField(fieldName, fieldValue, Field.Store.YES));
+				}
+			}
+		
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		}
+		return document;
+	}
+	
 	
 public static void main(String[] args) {
 		

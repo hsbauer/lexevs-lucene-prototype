@@ -69,13 +69,13 @@ public class LuceneIndexBuilder {
 			int numberOfProperties = 12;
 				if(!thesExactMatchDone){
 				ChildDocObject child1 = builder.generateChildDocWithSalt(parent,SearchTerms.BLOOD.getTerm());
-				Document doc1 = builder.mapToDocument(child1);
+				Document doc1 = builder.mapToDocumentExactMatch(child1);
 				list.add(doc1);
 				count++;
 				numberOfProperties--;
 				
 				ChildDocObject child = builder.generateChildDocWithSalt(parent,SearchTerms.CHAR.term);
-				Document doc = builder.mapToDocument(child);
+				Document doc = builder.mapToDocumentExactMatch(child);
 				count++;
 				list.add(doc);
 				numberOfProperties--;
@@ -84,41 +84,70 @@ public class LuceneIndexBuilder {
 			while (numberOfProperties > 0) {
 				//Semi random application of some search terms.  Attempting to replicate
 				//Number of values present in previous searches.
-				if(staticCount % 11 == 0){
+				if(count % 547 == 0){
 					ChildDocObject child = builder.generateChildDocWithSalt(parent, 
 							builder.randomTextGenerator(
 									builder.randomNumberGenerator(),SearchTerms.BLOOD.getTerm()));
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;numberOfProperties--;
-				}else if(staticCount % 3 == 0){
+				}else if(count % 233 == 0){
 					ChildDocObject child = builder.generateChildDocWithSalt(parent, 
 							builder.randomTextGenerator(
 							builder.randomNumberGenerator(),SearchTerms.CHAR.getTerm()));
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;numberOfProperties--;
-				}else if(staticCount % 5 == 0){
+				}else if(count % 71 == 0){
 					ChildDocObject child = builder.generateChildDocWithSalt(parent, 
 							builder.randomTextGenerator(
 							builder.randomNumberGenerator(),SearchTerms.ARTICLE.getTerm()));
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;numberOfProperties--;
-				}else if(staticCount % 13 == 0){
+				}else if(count % 2237 == 0){
 					ChildDocObject child = builder.generateChildDocWithSalt(parent,
 							builder.randomTextGenerator(
 									builder.randomNumberGenerator(),SearchTerms.LUNG_CANCER.getTerm()));
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;numberOfProperties--;
-				}else if(staticCount % 23 == 0){
+				}else if(count % 5077 == 0){
 					ChildDocObject child = builder.generateChildDocWithSalt(parent,
 							builder.randomTextGenerator(
 									builder.randomNumberGenerator(),SearchTerms.LIVER_CARCINOMA.getTerm()));
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;numberOfProperties--;
+				}else if(count % 2371 == 0){
+					ChildDocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGeneratorStartsWith(
+									builder.randomNumberGenerator(),SearchTerms.BLOOD.getTerm()));
+					Document doc = builder.mapToDocumentExactMatch(child);
+					list.add(doc);
+					count++;numberOfProperties--;
+				}else if(count % 79 == 0){
+					ChildDocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGeneratorStartsWith(
+									builder.randomNumberGenerator(),SearchTerms.ARTICLE.getTerm()));
+					Document doc = builder.mapToDocumentExactMatch(child);
+					list.add(doc);
+					count++;numberOfProperties--;
+				}else if(count % 3581 == 0){
+					ChildDocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGeneratorStartsWith(
+									builder.randomNumberGenerator(),SearchTerms.LUNG_CANCER.getTerm()));
+					Document doc = builder.mapToDocumentExactMatch(child);
+					list.add(doc);
+					count++;numberOfProperties--;
+				}else if(count % 23 == 0){
+					ChildDocObject child = builder.generateChildDocWithSalt(parent,
+							builder.randomTextGeneratorStartsWith(
+									builder.randomNumberGenerator(),SearchTerms.CHAR.getTerm()));
+					Document doc = builder.mapToDocumentExactMatch(child);
+					list.add(doc);
+					count++;numberOfProperties--;
+				
 				} else {
 					ChildDocObject child = builder.generateChildDoc(parent);
 					Document doc = builder.mapToDocument(child);
@@ -137,8 +166,7 @@ public class LuceneIndexBuilder {
 	
 	public List<Document> createBlockJoin(CodingScheme cs, LuceneContentBuilder builder){
 		List<Document> list = new ArrayList<Document>();
-		//need a static
-		int staticCount = count;
+
 		ParentDocObject parent = builder.generateParentDoc(cs.getCodingSchemeName(),
 				cs.getVersion(), cs.getURI(), "description" + cs.getCodingSchemeName());
 		if (cs.codingSchemeName.equals(CodingScheme.THESSCHEME.codingSchemeName)) {
@@ -161,63 +189,63 @@ public class LuceneIndexBuilder {
 			while (numberOfProperties > 0) {
 				//Semi random application of some search terms.  Attempting to replicate
 				//Number of values present in previous searches.
-				if(staticCount % 709 == 0){
+				if(count % 709 == 0){
 					ChildDocObject child = builder.generateChildDocWithSalt(parent, 
 							builder.randomTextGenerator(
 									builder.randomNumberGenerator(),SearchTerms.BLOOD.getTerm()));
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;numberOfProperties--;
-				}else if(staticCount % 7 == 0){
+				}else if(count % 7 == 0){
 					ChildDocObject child = builder.generateChildDocWithSalt(parent, 
 							builder.randomTextGenerator(
 							builder.randomNumberGenerator(),SearchTerms.CHAR.getTerm()));
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;numberOfProperties--;
-				}else if(staticCount % 59 == 0){
+				}else if(count % 59 == 0){
 					ChildDocObject child = builder.generateChildDocWithSalt(parent, 
 							builder.randomTextGenerator(
 							builder.randomNumberGenerator(),SearchTerms.ARTICLE.getTerm()));
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;numberOfProperties--;
-				}else if(staticCount % 5953 == 0){
+				}else if(count % 5953 == 0){
 					ChildDocObject child = builder.generateChildDocWithSalt(parent,
 							builder.randomTextGenerator(
 									builder.randomNumberGenerator(),SearchTerms.LUNG_CANCER.getTerm()));
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;numberOfProperties--;
-				}else if(staticCount % 13399 == 0){
+				}else if(count % 13399 == 0){
 					ChildDocObject child = builder.generateChildDocWithSalt(parent,
 							builder.randomTextGenerator(
 									builder.randomNumberGenerator(),SearchTerms.LIVER_CARCINOMA.getTerm()));
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;numberOfProperties--;
-				}else if(staticCount % 2371 == 0){
+				}else if(count % 2371 == 0){
 					ChildDocObject child = builder.generateChildDocWithSalt(parent,
 							builder.randomTextGeneratorStartsWith(
 									builder.randomNumberGenerator(),SearchTerms.BLOOD.getTerm()));
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;numberOfProperties--;
-				}else if(staticCount % 79 == 0){
+				}else if(count % 79 == 0){
 					ChildDocObject child = builder.generateChildDocWithSalt(parent,
 							builder.randomTextGeneratorStartsWith(
 									builder.randomNumberGenerator(),SearchTerms.ARTICLE.getTerm()));
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;numberOfProperties--;
-				}else if(staticCount % 3581 == 0){
+				}else if(count % 3581 == 0){
 					ChildDocObject child = builder.generateChildDocWithSalt(parent,
 							builder.randomTextGeneratorStartsWith(
 									builder.randomNumberGenerator(),SearchTerms.LUNG_CANCER.getTerm()));
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;numberOfProperties--;
-				}else if(staticCount % 23 == 0){
+				}else if(count % 23 == 0){
 					ChildDocObject child = builder.generateChildDocWithSalt(parent,
 							builder.randomTextGeneratorStartsWith(
 									builder.randomNumberGenerator(),SearchTerms.CHAR.getTerm()));
@@ -318,7 +346,7 @@ public class LuceneIndexBuilder {
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;numberOfProperties--;
-				}else if(count % 11 == 0){
+				}else if(count % 17 == 0){
 					ChildDocObject child = builder.generateChildDocWithSalt(parent,
 							builder.randomTextGeneratorStartsWith(
 									builder.randomNumberGenerator(),SearchTerms.CHAR.getTerm()));
@@ -369,7 +397,7 @@ public class LuceneIndexBuilder {
 					Document doc = builder.mapToDocument(child);
 					list.add(doc);
 					count++;numberOfProperties--;
-				}else if(count % 5 == 0){
+				}else if(count % 19 == 0){
 					ChildDocObject child = builder.generateChildDocWithSalt(parent, 
 							builder.randomTextGenerator(
 							builder.randomNumberGenerator(),SearchTerms.CHAR.getTerm()));
@@ -474,18 +502,18 @@ public class LuceneIndexBuilder {
 				count++;numberOfProperties--;
 			}else if(count % 1800017 == 0){
 				ChildDocObject child1 = builder.generateChildDocWithSalt(parent,SearchTerms.CODE1.getTerm());
-				Document doc1 = builder.mapToDocument(child1);
+				Document doc1 = builder.mapToDocumentExactMatch(child1);
 				list.add(doc1);
 				count++;numberOfProperties--;
 			}
 			else if(count % 600011 == 0){
 				ChildDocObject child = builder.generateChildDocWithSalt(parent,SearchTerms.CODE2.getTerm());
-				Document doc = builder.mapToDocument(child);
+				Document doc = builder.mapToDocumentExactMatch(child);
 				list.add(doc);
 				count++;numberOfProperties--;
 			}else if(count % 359987 == 0){
 				ChildDocObject child = builder.generateChildDocWithSalt(parent,SearchTerms.CODE3.getTerm());
-				Document doc = builder.mapToDocument(child);
+				Document doc = builder.mapToDocumentExactMatch(child);
 				list.add(doc);
 				count++;numberOfProperties--;
 			}else if(count % 540041 == 0){
@@ -544,14 +572,14 @@ public class LuceneIndexBuilder {
 				ChildDocObject child = builder.generateChildDocWithSalt(parent,
 						builder.randomTextGeneratorStartsWith(
 								builder.randomNumberGenerator(),SearchTerms.BLOOD.getTerm()));
-				Document doc = builder.mapToDocument(child);
+				Document doc = builder.mapToDocumentExactMatch(child);
 				list.add(doc);
 				count++;numberOfProperties--;
 			}else if(count % 13 == 0){
 				ChildDocObject child = builder.generateChildDocWithSalt(parent,
 						builder.randomTextGeneratorStartsWith(
 								builder.randomNumberGenerator(),SearchTerms.CHAR.getTerm()));
-				Document doc = builder.mapToDocument(child);
+				Document doc = builder.mapToDocumentExactMatch(child);
 				list.add(doc);
 				count++;numberOfProperties--;
 			}

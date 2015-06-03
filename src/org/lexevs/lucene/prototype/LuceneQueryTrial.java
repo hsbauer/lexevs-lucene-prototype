@@ -1,6 +1,8 @@
 package org.lexevs.lucene.prototype;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.CachingWrapperFilter;
@@ -41,17 +44,23 @@ public class LuceneQueryTrial {
 	StringBuilder output;
 	IndexReader reader;
 	IndexSearcher searcher;
-	int hitsPerPage = 20000;
+	int hitsPerPage = 2000;
 	
 	public LuceneQueryTrial(Directory index) throws IOException {
 		this.index = index;
 		output = new StringBuilder();
-		reader =  DirectoryReader.open(index);;
-		searcher = new IndexSearcher(reader);;
+		reader =  DirectoryReader.open(index);
+		searcher = new IndexSearcher(reader);
+//		output.append(initOutPut());
 	}
 	
-	public List<String> luceneToParentJoinQuery(SearchTerms term, CodingScheme scheme) throws IOException, ParseException{
+	private String initOutPut() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
+	public List<String> luceneToParentJoinQuery(SearchTerms term, CodingScheme scheme) throws IOException, ParseException{
+		
 		TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
 		long start = System.currentTimeMillis();
 		  Filter codingScheme = new FixedBitSetCachingWrapperFilter(
@@ -65,21 +74,95 @@ public class LuceneQueryTrial {
 		  searcher.search(termJoinQuery, collector);
 
 		  ScoreDoc[] hits = collector.topDocs().scoreDocs;
+
+			String ecode = null;
+			if(hits.length > 0){
+			ecode = searcher.doc(hits[0].doc).get("entityCode");
+			}
 			long time = System.currentTimeMillis() - start;
 			System.out.println("\nFor codingScheme: " + scheme.codingSchemeName +  " term: " + term.getTerm());
 			System.out.println("Search Time to Parent Join: " + time);
 		  System.out.println("Found Parent Hits: " + hits.length + " hits.");
 		  List<String> list = new ArrayList<String>();
-		  for(int i=0;i<hits.length;++i) {
-			  Document d = null;
-		      int docId = hits[i].doc;
-		      if(docId > 0){
-		      d = searcher.doc(docId);
-		      list.add(d.get("entityCode"));
-//		      System.out.println((i + 1) + ". " + d.get("entityCode") + "\t" + d.get("entityDescription"));
-		      }
-		  	}
+		  list.add(ecode);
+		  output.append(scheme.getCodingSchemeName() + "," + term.getTerm() + "," + "ToParentJoinParsedQuery" + ","+ "time in milliseconds: " + time + "," + "results: " + hits.length + "\n" );
 		  
+//		  for(int i=0;i<hits.length;++i) {
+//			  Document d = null;
+//		      int docId = hits[i].doc;
+//		      if(docId > 0){
+//		      d = searcher.doc(docId);
+//		      list.add(d.get("entityCode"));
+//		      System.out.println((i + 1) + ". " + d.get("entityCode") + "\t" + d.get("entityDescription"));
+//		      }
+//		  	}
+		  
+		  return list;
+	}
+	
+	public List<String> luceneToParentJoinStartsWithQuery(SearchTerms term, CodingScheme scheme) throws IOException, ParseException{
+
+		TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
+		long start = System.currentTimeMillis();
+		  Filter codingScheme = new FixedBitSetCachingWrapperFilter(
+                  new QueryWrapperFilter(new QueryParser("codingSchemeName", new StandardAnalyzer(new CharArraySet( 0, true))).parse(scheme.getCodingSchemeName())));
+
+		  BooleanQuery bquery = new BooleanQuery();
+		  bquery.add(new TermQuery(new Term("propertyValue", term.getTerm() + "*")), BooleanClause.Occur.MUST);
+		  Query query = new QueryParser(null, new KeywordAnalyzer()).createBooleanQuery("propertyValue", term.getTerm().toLowerCase(), Occur.MUST);
+		  ToParentBlockJoinQuery termJoinQuery = new ToParentBlockJoinQuery(
+				    query, 
+				    codingScheme,
+				    ScoreMode.Total);
+		  searcher.search(termJoinQuery, collector);
+
+		  ScoreDoc[] hits = collector.topDocs().scoreDocs;
+
+			String ecode = null;
+			if(hits.length > 0){
+			ecode = searcher.doc(hits[0].doc).get("entityCode");
+			}
+			long time = System.currentTimeMillis() - start;
+			System.out.println("\nSearch Time to Parent Join: " + time);
+			System.out.println("For codingScheme: " + scheme.codingSchemeName +  " Starts with term: " + term.getTerm().toLowerCase());
+			System.out.println("Found entitycode: " + ecode);
+			System.out.println("Found Parent Hits: " + hits.length + " hits.");
+		  List<String> list = new ArrayList<String>();
+		  list.add(ecode);	
+		  output.append(scheme.getCodingSchemeName() + "," + term.getTerm() + "," + "ToParentJoinStartsWithQuery" + ","+ "time in milliseconds: " + time + "," + "results: " + hits.length + "\n" );
+		  return list;
+	}
+	
+
+	public List<String> luceneToParentJoinExactMatchQuery(SearchTerms term, CodingScheme scheme) throws IOException, ParseException{
+
+		TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
+		long start = System.currentTimeMillis();
+		  Filter codingScheme = new FixedBitSetCachingWrapperFilter(
+                  new QueryWrapperFilter(new QueryParser("codingSchemeName", new StandardAnalyzer(new CharArraySet( 0, true))).parse(scheme.getCodingSchemeName())));
+
+		  BooleanQuery bquery = new BooleanQuery();
+		  bquery.add(new TermQuery(new Term("propertyValue", term.getTerm())), BooleanClause.Occur.MUST);
+		  Query query = new QueryParser(null, new KeywordAnalyzer()).createBooleanQuery("propertyValue", term.getTerm().toLowerCase(), Occur.MUST);
+		  ToParentBlockJoinQuery termJoinQuery = new ToParentBlockJoinQuery(
+				    query, 
+				    codingScheme,
+				    ScoreMode.Total);
+		  searcher.search(termJoinQuery, collector);
+
+		  ScoreDoc[] hits = collector.topDocs().scoreDocs;
+
+			String ecode = null;
+			if(hits.length > 0){
+			ecode = searcher.doc(hits[0].doc).get("entityCode");
+			}
+			long time = System.currentTimeMillis() - start;
+			System.out.println("\nSearch Time to Parent Join: " + time);
+			System.out.println("For codingScheme: " + scheme.codingSchemeName +  " Exact Match term: " + term.getTerm().toLowerCase());
+		  System.out.println("Found Parent Hits: " + hits.length + " hits.");
+		  List<String> list = new ArrayList<String>();
+		  list.add(ecode);		 
+		  output.append(scheme.getCodingSchemeName() + "," + term.getTerm() + "," + "ToParentExactQuery" + ","+ "time in milliseconds: " + time + "," + "results: " + hits.length + "\n" );
 		  return list;
 	}
 	
@@ -113,6 +196,31 @@ public class LuceneQueryTrial {
 				0, // withinGroupOffset
 				true // fillSortFields
 				);
+		GroupDocs<Integer>[] docs = null;
+		if(hits != null){
+		docs = hits.groups;
+		}
+		else{
+			System.out.println("No values returned for: " + term.getTerm());
+		}
+//		for (int j = 0; j < docs.length; j++) {
+
+//			ScoreDoc[] sd = docs[j].scoreDocs;
+//			for (int hit = 0; hit < sd.length; hit++) {
+//				System.out.println("docid: " + sd[hit].doc);
+//				Document d = searcher.doc(sd[0].doc);
+//				System.out.println((j + 1) + ". " + d.get("propertyName")
+//						+ "\t" + d.get("propertyValue"));
+//			}
+
+//		}
+		Document d = null;
+		if(docs != null){
+		 d = searcher.doc(docs[0].scoreDocs[0].doc);
+		}else{
+			System.out.println("No docs found for term: " + term.getTerm());
+			return;
+		}
 		long time = System.currentTimeMillis() - start;
 		System.out.println("\nFor codingScheme: " + scheme.codingSchemeName +  " term: " + term.getTerm());
 		System.out.println("Search Time To Parent Group Join: " + time);
@@ -122,20 +230,7 @@ public class LuceneQueryTrial {
 		System.out.println("Found " + hits.totalGroupedHitCount + " hits.");
 		System.out.println("Found " + hits.totalGroupCount.toString()
 				+ " hits.");
-
-		GroupDocs<Integer>[] docs = hits.groups;
-		for (int j = 0; j < docs.length; j++) {
-
-			ScoreDoc[] sd = docs[j].scoreDocs;
-//			for (int hit = 0; hit < sd.length; hit++) {
-//				System.out.println("docid: " + sd[hit].doc);
-//				Document d = searcher.doc(sd[0].doc);
-//				System.out.println((j + 1) + ". " + d.get("propertyName")
-//						+ "\t" + d.get("propertyValue"));
-//			}
-
-		}
-
+		 output.append(scheme.getCodingSchemeName() + "," + term.getTerm() + "," + "ToParentGroupJoinParsedQuery" + ","+ "time in milliseconds: " + time + "," + "results: " + hits.totalGroupCount + "\n" );
 	}
 
 	public void luceneToChildJoinQuery(String search,
@@ -145,14 +240,20 @@ public class LuceneQueryTrial {
 		
 		  Filter codingScheme = new FixedBitSetCachingWrapperFilter(
                   new QueryWrapperFilter(new QueryParser("codingSchemeName", new StandardAnalyzer(new CharArraySet( 0, true))).parse(scheme.getCodingSchemeName())));
-
-		  Query query = new QueryParser(null, new StandardAnalyzer(new CharArraySet( 0, true))).createBooleanQuery("entityCode", search, Occur.MUST);
+		  Query query = null;
+		  if(search != null){
+		  query = new QueryParser(null, new StandardAnalyzer(new CharArraySet( 0, true))).createBooleanQuery("entityCode", search, Occur.MUST);
+		  }else{
+			  System.out.println("No values available for child search");
+			  return;
+		  }
 		  ToChildBlockJoinQuery termJoinQuery = new ToChildBlockJoinQuery(
 				    query, 
 				    codingScheme,
 				   false);
 		  searcher.search(termJoinQuery, collector);
 		  ScoreDoc[] hits = collector.topDocs().scoreDocs;
+		  if(hits != null && hits.length > 0){searcher.doc(hits[0].doc);}
 		long time = System.currentTimeMillis() - start;
 		System.out.println("\nFor codingScheme: " + scheme.codingSchemeName +  " psuedo entity code: " + search);
 		System.out.println("Search Time To Child Join: " + time);
@@ -162,13 +263,13 @@ public class LuceneQueryTrial {
 //		      Document d = searcher.doc(docId);
 ////		      System.out.println((i + 1) + ". " + d.get("propertyName") + "\t" + d.get("propertyValue"));
 //		  	}
-		
+		  output.append(scheme.getCodingSchemeName() + "," + "entityCode: "  + search + "," + "ToChildJoinParsedQuery" + ","+ "time in milliseconds: " + time + "," + "results: " + hits.length + "\n" );
 	}
 	
 	
 	public List<String> luceneToAllParentJoinQuery(SearchTerms term) throws IOException, ParseException{
 
-		TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
+		TopScoreDocCollector collector = TopScoreDocCollector.create(1000, true);
 		long start = System.currentTimeMillis();
 		  Filter codingScheme = new FixedBitSetCachingWrapperFilter(
                   new QueryWrapperFilter(new QueryParser("parentDoc", new StandardAnalyzer(new CharArraySet( 0, true))).parse("yes")));
@@ -181,6 +282,9 @@ public class LuceneQueryTrial {
 		  searcher.search(termJoinQuery, collector);
 
 		  ScoreDoc[] hits = collector.topDocs().scoreDocs;
+		  Document d = null;
+		  if(hits != null && hits.length > 0)
+		   {d = searcher.doc(hits[0].doc);}
 			long time = System.currentTimeMillis() - start;
 			System.out.println("\n" + " term: " + term.getTerm());
 			System.out.println("Search Time to Parent Join: " + time);
@@ -195,10 +299,49 @@ public class LuceneQueryTrial {
 ////		      System.out.println((i + 1) + ". " + d.get("entityCode") + "\t" + d.get("entityDescription"));
 //		      }
 //		  	}
-		  
+		  list.add(d.get("entityCode"));
+		  output.append("All Schemes" + "," + term.getTerm() + "," + "ToParentJoinParsedQuery" + ","+ "time in milliseconds: " + time + "," + "results: " + hits.length + "\n" );
 		  return list;
 	}
+	
+	public List<String> luceneToAllParentExactMatchQuery(SearchTerms term) throws IOException, ParseException{
 
+		TopScoreDocCollector collector = TopScoreDocCollector.create(1000, true);
+		long start = System.currentTimeMillis();
+		  Filter codingScheme = new FixedBitSetCachingWrapperFilter(
+                  new QueryWrapperFilter(new QueryParser("parentDoc", new StandardAnalyzer(new CharArraySet( 0, true))).parse("yes")));
+
+		  Query query = new QueryParser(null, new KeywordAnalyzer()).createBooleanQuery("propertyValue", term.getTerm().toLowerCase(), Occur.MUST);
+		  ToParentBlockJoinQuery termJoinQuery = new ToParentBlockJoinQuery(
+				    query, 
+				    codingScheme,
+				    ScoreMode.Total);
+		  searcher.search(termJoinQuery, collector);
+
+		  ScoreDoc[] hits = collector.topDocs().scoreDocs;
+		  Document d = null;
+		  if(hits != null && hits.length > 0)
+		   {d = searcher.doc(hits[0].doc);}
+			long time = System.currentTimeMillis() - start;
+			System.out.println("\n" + " term: " + term.getTerm());
+			System.out.println("Search Time to Parent Join: " + time);
+		  System.out.println("Found Parent Hits: " + hits.length + " hits.");
+		  List<String> list = new ArrayList<String>();
+		  output.append("All Schemes" + "," + term.getTerm() + "," + "ToParentJoinExactMatchQuery" + ","+ "time in milliseconds: " + time + "," + "results: " + hits.length + "\n" );
+		  return list;
+	}
+	
+	public void stringBuilderToFile() throws IOException{
+		File file = new File("output.csv");
+		 BufferedWriter writer = null;
+		try {
+		   writer = new BufferedWriter(new FileWriter(file));
+		    writer.append(output);
+		} finally {
+		    if (writer != null) writer.close();
+		}
+	}
+	
 	public static void  main(String[] args){
 		File path = new File("/Users/m029206/git/lexevs-lucene-prototype/index");
 		Directory index = null;
@@ -224,6 +367,13 @@ public class LuceneQueryTrial {
 			List<String> liverlist =  trial.luceneToParentJoinQuery(SearchTerms.LIVER_CARCINOMA, CodingScheme.THESSCHEME);
 			trial.luceneToChildJoinQuery(liverlist.get(0), CodingScheme.THESSCHEME);
 			trial.luceneToParentGroupingJoinQuery(SearchTerms.LIVER_CARCINOMA, CodingScheme.THESSCHEME);
+			trial.luceneToParentJoinStartsWithQuery(SearchTerms.BLOOD, CodingScheme.THESSCHEME);
+			trial.luceneToParentJoinStartsWithQuery(SearchTerms.ARTICLE, CodingScheme.THESSCHEME);
+			trial.luceneToParentJoinStartsWithQuery(SearchTerms.LUNG_CANCER, CodingScheme.THESSCHEME);
+			trial.luceneToParentJoinStartsWithQuery(SearchTerms.CHAR, CodingScheme.THESSCHEME);
+			trial.luceneToParentJoinExactMatchQuery(SearchTerms.BLOOD, CodingScheme.THESSCHEME);
+			trial.luceneToParentJoinExactMatchQuery(SearchTerms.CHAR, CodingScheme.THESSCHEME);
+			System.out.println(trial.output.toString());
 			
 			List<String> snolist =  trial.luceneToParentJoinQuery(SearchTerms.BLOOD, CodingScheme.SNOMEDSCHEME);
 			trial.luceneToChildJoinQuery(snolist.get(0), CodingScheme.SNOMEDSCHEME);
@@ -243,6 +393,12 @@ public class LuceneQueryTrial {
 			List<String> snoliverlist =  trial.luceneToParentJoinQuery(SearchTerms.LIVER_CARCINOMA, CodingScheme.SNOMEDSCHEME);
 			trial.luceneToChildJoinQuery(snoliverlist.get(0), CodingScheme.SNOMEDSCHEME);
 			trial.luceneToParentGroupingJoinQuery(SearchTerms.LIVER_CARCINOMA, CodingScheme.SNOMEDSCHEME);
+			trial.luceneToParentJoinStartsWithQuery(SearchTerms.BLOOD, CodingScheme.SNOMEDSCHEME);
+			trial.luceneToParentJoinStartsWithQuery(SearchTerms.ARTICLE, CodingScheme.SNOMEDSCHEME);
+			trial.luceneToParentJoinStartsWithQuery(SearchTerms.LUNG_CANCER, CodingScheme.SNOMEDSCHEME);
+			trial.luceneToParentJoinStartsWithQuery(SearchTerms.CHAR, CodingScheme.SNOMEDSCHEME);
+			trial.luceneToParentJoinExactMatchQuery(SearchTerms.BLOOD, CodingScheme.SNOMEDSCHEME);
+			trial.luceneToParentJoinExactMatchQuery(SearchTerms.CHAR, CodingScheme.SNOMEDSCHEME);
 			
 			List<String> metalist =  trial.luceneToParentJoinQuery(SearchTerms.BLOOD, CodingScheme.METASCHEME);
 			trial.luceneToChildJoinQuery(metalist.get(0), CodingScheme.METASCHEME);
@@ -262,16 +418,27 @@ public class LuceneQueryTrial {
 			List<String> metaliverlist =  trial.luceneToParentJoinQuery(SearchTerms.LIVER_CARCINOMA, CodingScheme.METASCHEME);
 			trial.luceneToChildJoinQuery(metaliverlist.get(0), CodingScheme.METASCHEME);
 			trial.luceneToParentGroupingJoinQuery(SearchTerms.LIVER_CARCINOMA, CodingScheme.METASCHEME);
+			trial.luceneToParentGroupingJoinQuery(SearchTerms.LIVER_CARCINOMA, CodingScheme.METASCHEME);
+			trial.luceneToParentJoinStartsWithQuery(SearchTerms.BLOOD, CodingScheme.METASCHEME);
+			trial.luceneToParentJoinStartsWithQuery(SearchTerms.ARTICLE, CodingScheme.METASCHEME);
+			trial.luceneToParentJoinStartsWithQuery(SearchTerms.LUNG_CANCER, CodingScheme.METASCHEME);
+			trial.luceneToParentJoinStartsWithQuery(SearchTerms.CHAR, CodingScheme.METASCHEME);
+			trial.luceneToParentJoinExactMatchQuery(SearchTerms.BLOOD, CodingScheme.METASCHEME);
+			trial.luceneToParentJoinExactMatchQuery(SearchTerms.CHAR, CodingScheme.METASCHEME);
+			
 			
 			trial.luceneToAllParentJoinQuery(SearchTerms.BLOOD);
 			trial.luceneToAllParentJoinQuery(SearchTerms.ARTICLE);
 			trial.luceneToAllParentJoinQuery(SearchTerms.CHAR);
-			trial.luceneToAllParentJoinQuery(SearchTerms.CODE1);
-			trial.luceneToAllParentJoinQuery(SearchTerms.CODE2);
-			trial.luceneToAllParentJoinQuery(SearchTerms.CODE3);
+			trial.luceneToAllParentExactMatchQuery(SearchTerms.CODE1);
+			trial.luceneToAllParentExactMatchQuery(SearchTerms.CODE2);
+			trial.luceneToAllParentExactMatchQuery(SearchTerms.CODE3);
 			trial.luceneToAllParentJoinQuery(SearchTerms.MUD);
 			trial.luceneToAllParentJoinQuery(SearchTerms.LIVER_CARCINOMA);
 			trial.luceneToAllParentJoinQuery(SearchTerms.LUNG_CANCER);
+			
+			System.out.println(trial.output.toString());
+			trial.stringBuilderToFile();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
