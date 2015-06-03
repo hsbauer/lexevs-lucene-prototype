@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +21,6 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.CachingWrapperFilter;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -30,14 +31,13 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.grouping.GroupDocs;
 import org.apache.lucene.search.grouping.TopGroups;
-import org.apache.lucene.search.join.FixedBitSetCachingWrapperFilter;
+import org.apache.lucene.search.join.BitDocIdSetCachingWrapperFilter;
 import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.search.join.ToChildBlockJoinQuery;
 import org.apache.lucene.search.join.ToParentBlockJoinCollector;
 import org.apache.lucene.search.join.ToParentBlockJoinQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.MMapDirectory;
-import org.apache.lucene.util.BytesRef;
 
 public class LuceneQueryTrial {
 	Directory index;
@@ -61,9 +61,9 @@ public class LuceneQueryTrial {
 
 	public List<String> luceneToParentJoinQuery(SearchTerms term, CodingScheme scheme) throws IOException, ParseException{
 		
-		TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
+		TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage);
 		long start = System.currentTimeMillis();
-		  Filter codingScheme = new FixedBitSetCachingWrapperFilter(
+		  BitDocIdSetCachingWrapperFilter codingScheme = new BitDocIdSetCachingWrapperFilter(
                   new QueryWrapperFilter(new QueryParser("codingSchemeName", new StandardAnalyzer(new CharArraySet( 0, true))).parse(scheme.getCodingSchemeName())));
 
 		  Query query = new QueryParser(null, new StandardAnalyzer(new CharArraySet( 0, true))).createBooleanQuery("propertyValue", term.getTerm(), Occur.MUST);
@@ -102,9 +102,9 @@ public class LuceneQueryTrial {
 	
 	public List<String> luceneToParentJoinStartsWithQuery(SearchTerms term, CodingScheme scheme) throws IOException, ParseException{
 
-		TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
+		TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage);
 		long start = System.currentTimeMillis();
-		  Filter codingScheme = new FixedBitSetCachingWrapperFilter(
+		  BitDocIdSetCachingWrapperFilter codingScheme = new BitDocIdSetCachingWrapperFilter(
                   new QueryWrapperFilter(new QueryParser("codingSchemeName", new StandardAnalyzer(new CharArraySet( 0, true))).parse(scheme.getCodingSchemeName())));
 
 		  BooleanQuery bquery = new BooleanQuery();
@@ -136,9 +136,9 @@ public class LuceneQueryTrial {
 
 	public List<String> luceneToParentJoinExactMatchQuery(SearchTerms term, CodingScheme scheme) throws IOException, ParseException{
 
-		TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
+		TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage);
 		long start = System.currentTimeMillis();
-		  Filter codingScheme = new FixedBitSetCachingWrapperFilter(
+		  BitDocIdSetCachingWrapperFilter codingScheme = new BitDocIdSetCachingWrapperFilter(
                   new QueryWrapperFilter(new QueryParser("codingSchemeName", new StandardAnalyzer(new CharArraySet( 0, true))).parse(scheme.getCodingSchemeName())));
 
 		  BooleanQuery bquery = new BooleanQuery();
@@ -177,7 +177,7 @@ public class LuceneQueryTrial {
 				true // trackMaxScore
 		);
 		long start = System.currentTimeMillis();
-		Filter codingScheme = new FixedBitSetCachingWrapperFilter(
+		BitDocIdSetCachingWrapperFilter codingScheme = new BitDocIdSetCachingWrapperFilter(
 				new QueryWrapperFilter(new QueryParser("codingSchemeName",
 						new StandardAnalyzer(new CharArraySet(0, true)))
 						.parse(scheme.getCodingSchemeName())));
@@ -236,9 +236,9 @@ public class LuceneQueryTrial {
 	public void luceneToChildJoinQuery(String search,
 			CodingScheme scheme) throws IOException, ParseException {
 		long start = System.currentTimeMillis();
-		TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
+		TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage);
 		
-		  Filter codingScheme = new FixedBitSetCachingWrapperFilter(
+		  BitDocIdSetCachingWrapperFilter codingScheme = new BitDocIdSetCachingWrapperFilter(
                   new QueryWrapperFilter(new QueryParser("codingSchemeName", new StandardAnalyzer(new CharArraySet( 0, true))).parse(scheme.getCodingSchemeName())));
 		  Query query = null;
 		  if(search != null){
@@ -249,8 +249,7 @@ public class LuceneQueryTrial {
 		  }
 		  ToChildBlockJoinQuery termJoinQuery = new ToChildBlockJoinQuery(
 				    query, 
-				    codingScheme,
-				   false);
+				    codingScheme);
 		  searcher.search(termJoinQuery, collector);
 		  ScoreDoc[] hits = collector.topDocs().scoreDocs;
 		  if(hits != null && hits.length > 0){searcher.doc(hits[0].doc);}
@@ -269,9 +268,9 @@ public class LuceneQueryTrial {
 	
 	public List<String> luceneToAllParentJoinQuery(SearchTerms term) throws IOException, ParseException{
 
-		TopScoreDocCollector collector = TopScoreDocCollector.create(1000, true);
+		TopScoreDocCollector collector = TopScoreDocCollector.create(1000);
 		long start = System.currentTimeMillis();
-		  Filter codingScheme = new FixedBitSetCachingWrapperFilter(
+		  BitDocIdSetCachingWrapperFilter codingScheme = new BitDocIdSetCachingWrapperFilter(
                   new QueryWrapperFilter(new QueryParser("parentDoc", new StandardAnalyzer(new CharArraySet( 0, true))).parse("yes")));
 
 		  Query query = new QueryParser(null, new StandardAnalyzer(new CharArraySet( 0, true))).createBooleanQuery("propertyValue", term.getTerm(), Occur.MUST);
@@ -306,9 +305,9 @@ public class LuceneQueryTrial {
 	
 	public List<String> luceneToAllParentExactMatchQuery(SearchTerms term) throws IOException, ParseException{
 
-		TopScoreDocCollector collector = TopScoreDocCollector.create(1000, true);
+		TopScoreDocCollector collector = TopScoreDocCollector.create(1000);
 		long start = System.currentTimeMillis();
-		  Filter codingScheme = new FixedBitSetCachingWrapperFilter(
+		  BitDocIdSetCachingWrapperFilter codingScheme = new BitDocIdSetCachingWrapperFilter(
                   new QueryWrapperFilter(new QueryParser("parentDoc", new StandardAnalyzer(new CharArraySet( 0, true))).parse("yes")));
 
 		  Query query = new QueryParser(null, new KeywordAnalyzer()).createBooleanQuery("propertyValue", term.getTerm().toLowerCase(), Occur.MUST);
@@ -343,7 +342,7 @@ public class LuceneQueryTrial {
 	}
 	
 	public static void  main(String[] args){
-		File path = new File("/Users/m029206/git/lexevs-lucene-prototype/index");
+		Path path = Paths.get("/Users/m029206/git/lexevs-lucene-prototype/index");
 		Directory index = null;
 		try {
 			index = new MMapDirectory(path);

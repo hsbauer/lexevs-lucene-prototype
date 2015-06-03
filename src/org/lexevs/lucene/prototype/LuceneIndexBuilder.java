@@ -33,10 +33,10 @@ public class LuceneIndexBuilder {
 	
 	public void init(){
 		try {
-			File path = new File("/Users/m029206/git/lexevs-lucene-prototype/index");
+			Path path = Paths.get("/Users/m029206/git/lexevs-lucene-prototype/index");
 			Directory dir = new MMapDirectory(path);
 			Analyzer analyzer=new StandardAnalyzer(new CharArraySet( 0, true));
-			IndexWriterConfig iwc= new IndexWriterConfig(Version.LUCENE_4_10_4, analyzer);
+			IndexWriterConfig iwc= new IndexWriterConfig(analyzer);
 			IndexWriter writer = new IndexWriter(dir, iwc);
 			createCodingSchemeIndex(builder, writer );
 			writer.commit();
@@ -50,7 +50,7 @@ public class LuceneIndexBuilder {
 		long start = System.currentTimeMillis();
 		for(CodingScheme cs: CodingScheme.values()){
 			for(int i = 0; i < cs.numberOfEntities; i++){
-				List<Document> list = createBlockJoin(cs, builder);
+				List<Document> list = createMinimalBlockJoin(cs, builder);
 				writer.addDocuments(list);
 			}
 		}
