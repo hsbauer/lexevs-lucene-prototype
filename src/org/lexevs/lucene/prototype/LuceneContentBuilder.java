@@ -47,6 +47,8 @@ public class LuceneContentBuilder {
 	public ChildDocObject generateChildDoc(ParentDocObject parent){
 		ChildDocObject o = new ChildDocObject();
 //		o.UID = randomTextGenerator();
+		o.blockId = parent.blockId;
+		o.ecode = parent.entityCode;
 		o.namespace = parent.entityCodeNamepace;
 		o.dm_propertyValue = randomTextGenerator();
 		o.isPreferred = randomTextGenerator();

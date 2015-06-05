@@ -1,5 +1,4 @@
 package org.lexevs.lucene.prototype;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,12 +13,10 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.MMapDirectory;
-import org.apache.lucene.util.Version;
 
 
 public class LuceneIndexBuilder {
 
-//	private int maxDocs = 100000;
 	private int count = 0;
 	LuceneContentBuilder builder;
 	boolean thesExactMatchDone = false;
@@ -50,7 +47,7 @@ public class LuceneIndexBuilder {
 		long start = System.currentTimeMillis();
 		for(CodingScheme cs: CodingScheme.values()){
 			for(int i = 0; i < cs.numberOfEntities; i++){
-				List<Document> list = createMinimalBlockJoin(cs, builder);
+				List<Document> list = createBlockJoin(cs, builder);
 				writer.addDocuments(list);
 			}
 		}
