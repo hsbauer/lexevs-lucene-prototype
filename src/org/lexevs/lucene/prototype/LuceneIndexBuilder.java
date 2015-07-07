@@ -48,7 +48,9 @@ public class LuceneIndexBuilder {
 		for(CodingScheme cs: CodingScheme.values()){
 			for(int i = 0; i < cs.numberOfEntities; i++){
 				List<Document> list = createBlockJoin(cs, builder);
+				if(!list.isEmpty()){
 				writer.addDocuments(list);
+				}
 			}
 		}
 		System.out.println("Time loading: " + (System.currentTimeMillis() - start));
@@ -57,8 +59,7 @@ public class LuceneIndexBuilder {
 	
 	public List<Document> createMinimalBlockJoin(CodingScheme cs, LuceneContentBuilder builder){
 		List<Document> list = new ArrayList<Document>();
-		//need a static
-		int staticCount = count;
+
 		ParentDocObject parent = builder.generateParentDoc(cs.getCodingSchemeName(),
 				cs.getVersion(), cs.getURI(), "description");
 		if (cs.codingSchemeName.equals(CodingScheme.THESSCHEME.codingSchemeName)) {
@@ -163,7 +164,7 @@ public class LuceneIndexBuilder {
 	
 	public List<Document> createBlockJoin(CodingScheme cs, LuceneContentBuilder builder){
 		List<Document> list = new ArrayList<Document>();
-
+		//build a parent regardless
 		ParentDocObject parent = builder.generateParentDoc(cs.getCodingSchemeName(),
 				cs.getVersion(), cs.getURI(), "description" + cs.getCodingSchemeName());
 		if (cs.codingSchemeName.equals(CodingScheme.THESSCHEME.codingSchemeName)) {
@@ -262,7 +263,7 @@ public class LuceneIndexBuilder {
 			list.add(par);
 			return list;
 		}
-		if (cs.codingSchemeName.equals(CodingScheme.SNOMEDSCHEME.codingSchemeName)) {
+		else if (cs.codingSchemeName.equals(CodingScheme.SNOMEDSCHEME.codingSchemeName)) {
 			//One per coding Scheme
 			int numberOfProperties = 12;
 				if(!snomedExactMatchDone){
@@ -361,7 +362,7 @@ public class LuceneIndexBuilder {
 			list.add(par);
 			return list;
 		}
-		if (cs.codingSchemeName.equals(CodingScheme.METASCHEME.codingSchemeName)) {
+		else if (cs.codingSchemeName.equals(CodingScheme.METASCHEME.codingSchemeName)) {
 			
 			//One per coding Scheme
 			int numberOfProperties = 12;
@@ -475,6 +476,7 @@ public class LuceneIndexBuilder {
 			list.add(par);
 			return list;
 		}
+		else { 
 		//All other coding schemes.
 		int numberOfProperties = 12;
 			
@@ -579,10 +581,7 @@ public class LuceneIndexBuilder {
 				Document doc = builder.mapToDocumentExactMatch(child);
 				list.add(doc);
 				count++;numberOfProperties--;
-			}
-			if(numberOfProperties <= 0){
-			return list;}
-			else{
+			}else{
 			ChildDocObject child = builder.generateChildDoc(parent);
 			Document doc = builder.mapToDocument(child);
 			list.add(doc);
@@ -592,7 +591,9 @@ public class LuceneIndexBuilder {
 		Document par = builder.mapToDocument(parent);
 		list.add(par);
 		return list;
+		}
 	}
+
 
 	public static void main(String[] args) {
 	LuceneIndexBuilder builder = new LuceneIndexBuilder();
