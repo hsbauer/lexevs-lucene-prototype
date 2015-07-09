@@ -43,7 +43,6 @@ public class MultiIndexBuilder {
 			writer.commit();
 			writer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -52,8 +51,13 @@ public class MultiIndexBuilder {
 		long start = System.currentTimeMillis();
 		for(CodingScheme cs: CodingScheme.values()){
 			initIndex(cs);
+			indexes.putIfAbsent(cs.URI + "_" + cs.version, new MapNameVersion(cs.codingSchemeName, cs.version));
 		}
 		System.out.println("Time loading: " + (System.currentTimeMillis() - start));
+		
+		for(MapNameVersion nv: indexes.values()){
+			System.out.println(nv.getName() + ": " + nv.getVersion());
+		}
 	}
 	
     public List<Document> buildScheme(CodingScheme scheme) {
@@ -66,13 +70,9 @@ public class MultiIndexBuilder {
             case METASCHEME:
             	return buildMetaSchemeAnalog();
             default: 
-                return buildAnyOtherScheme(scheme);
+                return buildAllOtherSchemes(scheme);
         }
     }
-	private List<Document> buildAnyOtherScheme(CodingScheme scheme) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	public List<Document> buildThesaurusAnalog(){
 		List<Document> list = new ArrayList<Document>();
@@ -396,9 +396,132 @@ public class MultiIndexBuilder {
 	list.add(par);
 	return list;
 	}
-
+public List<Document> buildAllOtherSchemes(CodingScheme scheme){
+	List<Document> list = new ArrayList<Document>();
+	//build a parent regardless
+	ParentDocObject parent = builder.generateParentDoc(scheme.getCodingSchemeName(),
+			scheme.getVersion(), scheme.getURI(), "description" + scheme.getCodingSchemeName());
+	int numberOfProperties = 12;
+	
+	while (numberOfProperties > 0) {
+		//Semi random application of some search terms.  Attempting to replicate
+		//Number of values present in previous searches.
+		if(count % 200003 == 0){
+			ChildDocObject child1 = builder.generateChildDocWithSalt(parent,SearchTerms.BLOOD.getTerm());
+			Document doc1 = builder.mapToDocument(child1);
+			list.add(doc1);
+			count++;numberOfProperties--;
+		}
+		else if(count % 270001 == 0){
+			ChildDocObject child = builder.generateChildDocWithSalt(parent,SearchTerms.MUD.getTerm());
+			Document doc = builder.mapToDocument(child);
+			list.add(doc);
+			count++;numberOfProperties--;
+		}else if(count % 360007 == 0){
+			ChildDocObject child = builder.generateChildDocWithSalt(parent,SearchTerms.LUNG_CANCER.getTerm());
+			Document doc = builder.mapToDocument(child);
+			list.add(doc);
+			count++;numberOfProperties--;
+		}else if(count % 1800017 == 0){
+			ChildDocObject child1 = builder.generateChildDocWithSalt(parent,SearchTerms.CODE1.getTerm());
+			Document doc1 = builder.mapToDocumentExactMatch(child1);
+			list.add(doc1);
+			count++;numberOfProperties--;
+		}
+		else if(count % 600011 == 0){
+			ChildDocObject child = builder.generateChildDocWithSalt(parent,SearchTerms.CODE2.getTerm());
+			Document doc = builder.mapToDocumentExactMatch(child);
+			list.add(doc);
+			count++;numberOfProperties--;
+		}else if(count % 359987 == 0){
+			ChildDocObject child = builder.generateChildDocWithSalt(parent,SearchTerms.CODE3.getTerm());
+			Document doc = builder.mapToDocumentExactMatch(child);
+			list.add(doc);
+			count++;numberOfProperties--;
+		}else if(count % 540041 == 0){
+			ChildDocObject child = builder.generateChildDocWithSalt(parent,SearchTerms.LIVER_CARCINOMA.getTerm());
+			Document doc = builder.mapToDocument(child);
+			list.add(doc);
+			count++;numberOfProperties--;
+		}else if(count % 108011 == 0){
+			ChildDocObject child = builder.generateChildDocWithSalt(parent,SearchTerms.CHAR.term);
+			Document doc = builder.mapToDocument(child);
+			list.add(doc);
+			count++;numberOfProperties--;
+		}else if(count % 197 == 0){
+			ChildDocObject child = builder.generateChildDocWithSalt(parent, 
+					builder.randomTextGenerator(
+							builder.randomNumberGenerator(),SearchTerms.BLOOD.getTerm()));
+			Document doc = builder.mapToDocument(child);
+			list.add(doc);
+			count++;numberOfProperties--;
+		}else if(count % 6581 == 0){
+			ChildDocObject child = builder.generateChildDocWithSalt(parent, 
+					builder.randomTextGenerator(
+					builder.randomNumberGenerator(),SearchTerms.MUD.getTerm()));
+			Document doc = builder.mapToDocument(child);
+			list.add(doc);
+			count++;numberOfProperties--;
+		}else if(count % 5 == 0){
+			ChildDocObject child = builder.generateChildDocWithSalt(parent, 
+					builder.randomTextGenerator(
+					builder.randomNumberGenerator(),SearchTerms.CHAR.getTerm()));
+			Document doc = builder.mapToDocument(child);
+			list.add(doc);
+			count++;numberOfProperties--;
+		}else if(count % 107 == 0){
+			ChildDocObject child = builder.generateChildDocWithSalt(parent, 
+					builder.randomTextGenerator(
+					builder.randomNumberGenerator(),SearchTerms.ARTICLE.getTerm()));
+			Document doc = builder.mapToDocument(child);
+			list.add(doc);
+			count++;numberOfProperties--;
+		}else if(count % 5471 == 0){
+			ChildDocObject child = builder.generateChildDocWithSalt(parent,
+					builder.randomTextGenerator(
+							builder.randomNumberGenerator(),SearchTerms.LUNG_CANCER.getTerm()));
+			Document doc = builder.mapToDocument(child);
+			list.add(doc);
+			count++;numberOfProperties--;
+		}else if(count % 1459 == 0){
+			ChildDocObject child = builder.generateChildDocWithSalt(parent,
+					builder.randomTextGenerator(
+							builder.randomNumberGenerator(),SearchTerms.LIVER_CARCINOMA.getTerm()));
+			Document doc = builder.mapToDocument(child);
+			list.add(doc);
+			count++;numberOfProperties--;
+		}else if(count % 727 == 0){
+			ChildDocObject child = builder.generateChildDocWithSalt(parent,
+					builder.randomTextGeneratorStartsWith(
+							builder.randomNumberGenerator(),SearchTerms.BLOOD.getTerm()));
+			Document doc = builder.mapToDocumentExactMatch(child);
+			list.add(doc);
+			count++;numberOfProperties--;
+		}else if(count % 13 == 0){
+			ChildDocObject child = builder.generateChildDocWithSalt(parent,
+					builder.randomTextGeneratorStartsWith(
+							builder.randomNumberGenerator(),SearchTerms.CHAR.getTerm()));
+			Document doc = builder.mapToDocumentExactMatch(child);
+			list.add(doc);
+			count++;numberOfProperties--;
+		}else{
+		ChildDocObject child = builder.generateChildDoc(parent);
+		Document doc = builder.mapToDocument(child);
+		list.add(doc);
+		count++;numberOfProperties--;
+		}
+	}
+	Document par = builder.mapToDocument(parent);
+	list.add(par);
+	return list;
+}
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		try {
+			new MultiIndexBuilder().createCodingSchemeIndex();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 

@@ -4,10 +4,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.net.URI;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -15,21 +16,18 @@ import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Term;
+import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopScoreDocCollector;
+import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.grouping.GroupDocs;
 import org.apache.lucene.search.grouping.TopGroups;
 import org.apache.lucene.search.join.BitDocIdSetCachingWrapperFilter;
@@ -39,24 +37,37 @@ import org.apache.lucene.search.join.ToChildBlockJoinQuery;
 import org.apache.lucene.search.join.ToParentBlockJoinCollector;
 import org.apache.lucene.search.join.ToParentBlockJoinIndexSearcher;
 import org.apache.lucene.search.join.ToParentBlockJoinQuery;
-import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.MMapDirectory;
 
-public class LuceneQueryTrial {
-	Directory index;
-	StringBuilder output;
-	IndexReader reader;
+public class MultiIndexReadingUtil {
+	ConcurrentHashMap<String, MapNameVersion> indexes = null;
 	ToParentBlockJoinIndexSearcher searcher;
+	StringBuilder output;
 	int hitsPerPage = 50;
 	
-	public LuceneQueryTrial(Directory index) throws IOException {
-		this.index = index;
+	public MultiIndexReadingUtil(ConcurrentHashMap<String, MapNameVersion> indexes) throws IOException {
+		searcher = readIndexs(indexes);
 		output = new StringBuilder();
-		reader =  DirectoryReader.open(index);
-		searcher = new ToParentBlockJoinIndexSearcher(reader);
+	}
+
+	public ToParentBlockJoinIndexSearcher readIndexs(ConcurrentHashMap<String, MapNameVersion> indexes) throws IOException{
+
+		String baseURI = "/Users/m029206/git/lexevs-lucene-prototype/";
+		
+		IndexReader iR1 = DirectoryReader.open(new MMapDirectory(Paths.get(baseURI + "SNOMEDScheme")));
+		IndexReader iR2 = DirectoryReader.open(new MMapDirectory(Paths.get(baseURI + "TheScheme")));
+		IndexReader iR3 = DirectoryReader.open(new MMapDirectory(Paths.get(baseURI + "NCIMetaCodingScheme")));
+		IndexReader iR4 = DirectoryReader.open(new MMapDirectory(Paths.get(baseURI + "YetAnotherScheme")));
+		IndexReader iR5 = DirectoryReader.open(new MMapDirectory(Paths.get(baseURI + "AScheme")));
+		IndexReader iR6 = DirectoryReader.open(new MMapDirectory(Paths.get(baseURI + "OkCodingScheme")));
+		IndexReader iR7 = DirectoryReader.open(new MMapDirectory(Paths.get(baseURI + "AnotherScheme")));
+		IndexReader iR8 = DirectoryReader.open(new MMapDirectory(Paths.get(baseURI + "ThesScheme")));
+		IndexReader iR9 = DirectoryReader.open(new MMapDirectory(Paths.get(baseURI + "TestScheme")));
+
+		MultiReader mr = new MultiReader(iR1, iR2, iR3, iR4, iR5, iR6, iR7, iR8, iR9);
+	     return new ToParentBlockJoinIndexSearcher(mr);
 	}
 	
-
 	public List<String> luceneToParentJoinQuery(SearchTerms term, CodingScheme scheme) throws IOException, ParseException{
 		List<String> list = null;
 		//TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage);
@@ -241,7 +252,7 @@ public class LuceneQueryTrial {
 		+ " hits.");
 		System.out.println("Found " + hits.totalGroupedHitCount + " hits.");
 		System.out.println("Found " + hits.totalGroupCount.toString()
-				+ " hits.");
+				+ " hits.\n");
 		 output.append(scheme.getCodingSchemeName() + "," + term.getTerm() + "," + "ToParentGroupJoinParsedQuery" + ","+ "time in milliseconds: " + time + "," + "results: " + hits.totalGroupCount + "\n" );
 	}
 
@@ -339,12 +350,10 @@ public class LuceneQueryTrial {
 		}
 	}
 	
-	public static void  main(String[] args){
-		Path path = Paths.get("/Users/m029206/git/lexevs-lucene-prototype/index");
-		Directory index = null;
+	public static void main(String[] args) {
 		try {
-			index = new MMapDirectory(path);
-			LuceneQueryTrial trial = new LuceneQueryTrial(index);
+			
+			MultiIndexReadingUtil trial = new MultiIndexReadingUtil(null);
 			
 			List<String> list =  trial.luceneToParentJoinQuery(SearchTerms.BLOOD, CodingScheme.THESSCHEME);
 			trial.luceneToChildJoinQuery(list.get(0), CodingScheme.THESSCHEME);
@@ -445,4 +454,5 @@ public class LuceneQueryTrial {
 		}
 
 	}
+
 }
